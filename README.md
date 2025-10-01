@@ -1,10 +1,2 @@
-# ![screenshot](media/logo.png) Janus - Minimilistic application templates
-
-## Available Templates
-### [Angular](https://github.com/toalmoal/janus/tree/angular)
-
+# ![screenshot](media/logo.png) Janus - Minimilistic angular template ![screenshot](media/angular.png)
 This template is the minimalistic angular template shich you get with ```ng new```
-
-### [NodeJs + Express + TypeORM](https://github.com/toalmoal/janus/tree/express)
-
-This template provides an express server with TypeORM for db integration. It supports service static content and has a few REST endpoints implemented.
