@@ -3,6 +3,12 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "page/*": [ "app/page/*" ],
+      "theme/*": [ "app/theme/*" ],
+      "service/*": [ "app/service/*" ]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

@@ -1,0 +1,53 @@
+:host {
+  flex-grow: 1;
+  display: flex;
+}
+
+nb-layout {
+  display: flex;
+  flex-grow: 1;
+  ::ng-deep {
+    .scrollable-container,
+    .layout {
+      display: flex;
+      flex-grow: 1;
+    }
+  }
+}
+
+nb-layout-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row, .col-md-12 {
+  flex-grow: 1;
+  display: flex;
+}
+
+nb-card {
+  flex-grow: 1;
+}
+
+.flex-centered {
+  margin: auto;
+}
+
+nb-card-body {
+  display: flex;
+}
+
+.title {
+  text-align: center;
+}
+
+.sub-title {
+  text-align: center;
+  display: block;
+  margin-bottom: 3rem;
+}
+
+.home-button {
+  margin-bottom: 2rem;
+}
