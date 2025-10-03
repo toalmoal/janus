@@ -1,0 +1,55 @@
+services:
+
+  janus_mariadb:
+    container_name: janus_mariadb
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_USER: janus
+      MARIADB_DATABASE: janus
+      MARIADB_PASSWORD: "nMCYWg3e2GLxSPFe"
+      MARIADB_ROOT_PASSWORD: "Eu01l4HYtWwoomeF"
+    networks:
+      - janus_network
+    volumes:
+      - ../shared/mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb", "-u", "root", "-pEu01l4HYtWwoomeF", "--execute", "SHOW DATABASES;"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 50
+
+  janus_server:
+    image: "janus-express"
+    container_name: janus_server
+    environment:
+      NODE_ENV: "production"
+      SUPPRESS_NO_CONFIG_WARNING: "true"
+    networks:
+      - janus_network
+    volumes:
+      - "../shared:/opt/janus/shared"
+      - "./config:/janus/config"
+    depends_on:
+      janus_mariadb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  janus_nginx:
+    container_name: janus_nginx
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    networks:
+      - janus_network
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ../shared/resources/html:/usr/share/nginx/html
+    depends_on:
+      - janus_server
+
+networks:
+  janus_network:
+    driver: bridge
