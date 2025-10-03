@@ -1,0 +1,30 @@
+{
+   "compilerOptions": {
+      "lib": [
+         "dom",
+         "es5",
+         "es6"
+      ],
+      "outDir": "dist",
+      "baseUrl": ".",
+      "paths": {
+         "@/*": [ "src/*" ],
+         "view/*": [ "src/view/*" ],
+         "utils/*": [ "src/utils/*" ],
+         "model/*": [ "src/model/*" ],
+         "entity/*": [ "src/entity/*" ],
+         "routes/*": [ "src/routes/*" ],
+         "service/*": [ "src/service/*" ],
+         "controller/*": [ "src/controller/*" ],
+         "middleware/*": [ "src/middleware/*" ]
+      },
+      "target": "es6",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "isolatedModules": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true
+   }
+}
