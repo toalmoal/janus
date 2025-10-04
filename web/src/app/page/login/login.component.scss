@@ -1,0 +1,31 @@
+nb-layout {
+  display: flex;
+  flex-grow: 1;
+  ::ng-deep {
+    .scrollable-container,
+    .layout {
+      display: flex;
+      flex-grow: 1;
+    }
+  }
+}
+
+nb-layout-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nb-card {
+  margin: 0;
+}
+
+.title {
+  text-align: center;
+}
+
+.sub-title {
+  text-align: center;
+  display: block;
+  margin-bottom: 3rem;
+}

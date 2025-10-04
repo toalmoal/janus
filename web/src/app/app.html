@@ -1,0 +1,12 @@
+<router-outlet></router-outlet>
+
+<ng-template #confirmDialog let-data let-confirmDialog="dialogRef">
+  <nb-card>
+    <nb-card-header>{{ data.title }}</nb-card-header>
+    <nb-card-body>{{ data.subTitle }}</nb-card-body>
+    <nb-card-footer class="d-flex justify-content-end" style="gap: 1em;">
+      <button nbButton size="small" (click)="confirmDialog.close();">Cancel</button>
+      <button nbButton size="small" status="primary" (click)="confirmDialog.close(); data.onConfirm();">Confirm</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
