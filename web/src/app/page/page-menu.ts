@@ -11,10 +11,5 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: '404',
     icon: 'alert-triangle-outline',
     link: '/not-found'
-  },
-  {
-    title: 'Login',
-    icon: 'person-outline',
-    link: '/login'
   }
 ];

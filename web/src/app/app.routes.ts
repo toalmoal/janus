@@ -1,5 +1,6 @@
 import { Routes }             from '@angular/router';
 
+import { AuthGuard }          from 'app/init/auth.guard';
 import { PageComponent }      from 'page/page.component';
 import { LoginComponent }     from 'page/login/login.component';
 import { LandingComponent }   from 'page/landing/landing.component';
@@ -10,7 +11,7 @@ export const routes: Routes = [
     path: 'page',
     component: PageComponent,
     children: [
-      { path: "landing", component: LandingComponent },
+      { path: "landing", canActivate: [ AuthGuard ], component: LandingComponent },
       { path: '', redirectTo: 'landing', pathMatch: 'full' },
       { path: '**', redirectTo: 'not-found' },
     ]
@@ -23,6 +24,6 @@ export const routes: Routes = [
     path: 'not-found',
     component: NotFoundComponent,
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'page', pathMatch: 'full' },
   { path: '**', redirectTo: 'not-found' },
 ];

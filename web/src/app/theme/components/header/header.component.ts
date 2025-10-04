@@ -20,6 +20,7 @@ import { filter, map,
          takeUntil }                    from 'rxjs/operators';
 import { Subject }                      from 'rxjs';
 
+import { AuthService }                  from 'service/auth.service';
 import { AlertService }                 from 'service/alert.service';
 
 @Component({
@@ -57,6 +58,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
               private themeService: NbThemeService,
               private sidebarService: NbSidebarService,
               private breakpointService: NbMediaBreakpointsService,
+              private authService: AuthService,
               private alertService: AlertService) {
   }
 
@@ -118,7 +120,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.router.navigate([ '/' ]);
+    this.authService.logout();
+    //this.router.navigate([ '/login' ]);
+    location.replace("/");
   }
 
 }

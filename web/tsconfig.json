@@ -6,6 +6,7 @@
     "baseUrl": "src",
     "paths": {
       "page/*": [ "app/page/*" ],
+      "model/*": [ "app/model/*" ],
       "theme/*": [ "app/theme/*" ],
       "service/*": [ "app/service/*" ]
     },
