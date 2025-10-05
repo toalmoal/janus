@@ -1,11 +1,13 @@
-import { Component,
+import { inject,
+         Component,
          ChangeDetectionStrategy }  from '@angular/core';
 import { RouterOutlet }             from '@angular/router';
 
-import { NbMenuModule }             from '@nebular/theme';
+import { NbMenuItem,
+         NbMenuModule }             from '@nebular/theme';
 
-import { MENU_ITEMS }               from './page-menu';
 import { LayoutComponent }          from 'theme/layout/layout';
+import { MenuOptionsService }       from 'service/menu-options.service';
 
 @Component({
   standalone: true,
@@ -17,9 +19,13 @@ import { LayoutComponent }          from 'theme/layout/layout';
 })
 export class PageComponent {
 
-  menu = MENU_ITEMS;
+  private menuOptionsService = inject(MenuOptionsService);
 
   constructor() { 
+  }
+
+  get menu(): Array<NbMenuItem> {
+    return this.menuOptionsService.items;
   }
 
 }

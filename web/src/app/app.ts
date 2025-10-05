@@ -1,8 +1,9 @@
 import { signal,
+         inject,
          Component, 
-         AfterViewInit,
          ViewChild,
          TemplateRef,
+         AfterViewInit,
          ChangeDetectionStrategy }  from '@angular/core';
 import { AsyncPipe }                from '@angular/common';
 import { RouterOutlet }             from '@angular/router';
@@ -11,8 +12,9 @@ import { NbCardModule,
          NbAlertModule,
          NbButtonModule }           from '@nebular/theme';
 
+import { Observable }               from 'rxjs';
+
 import { Alert }                    from 'model/alert.model';
-import { Observable } from 'rxjs';
 import { AlertService }             from 'service/alert.service';
 
 @Component({
@@ -26,10 +28,12 @@ export class App implements AfterViewInit {
 
   protected readonly title = signal('web');
 
+  private alertService = inject(AlertService);
+
   @ViewChild('confirmDialog', { read: TemplateRef })
   confirmDialogTemplate!:TemplateRef<any>;
 
-  constructor(private alertService: AlertService) {
+  constructor() {
   }
 
   ngAfterViewInit(): void {

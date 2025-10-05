@@ -1,6 +1,7 @@
 import { Router,
          ActivatedRoute }       from '@angular/router';
-import { OnInit,
+import { inject,
+         OnInit,
          Component }            from '@angular/core';
 import { FormGroup,
          Validators,
@@ -16,10 +17,10 @@ import { NbCardModule,
          NbCheckboxModule }     from '@nebular/theme';
 
 import * as utils               from 'app/utils';
+import { AuthStatus }           from 'model/auth-status.model';
 import { AuthService }          from 'service/auth.service';
 import { AlertService }         from 'service/alert.service';
 import { AuthStatusService }    from 'service/auth-status.service';
-import { AuthStatus } from 'model/auth-status.model';
 
 const emailRegEx: string = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
 
@@ -33,15 +34,18 @@ const emailRegEx: string = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
 })
 export class LoginComponent implements OnInit {
 
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private formBuilder = inject(FormBuilder);
+
+  private authService = inject(AuthService);
+  private alertService = inject(AlertService);
+  private authStatusService = inject(AuthStatusService);
+
   loginForm: FormGroup;
   
-  constructor(private router: Router,
-              private route: ActivatedRoute,
-              private formBuilder: FormBuilder,
-              private authService: AuthService,
-              private authStatusService: AuthStatusService,
-              private alertService: AlertService) {
-    this.loginForm = formBuilder.group({
+  constructor() {
+    this.loginForm = this.formBuilder.group({
       'email': [null, [
         Validators.required,
         Validators.pattern(emailRegEx)]

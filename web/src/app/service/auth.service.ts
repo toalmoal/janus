@@ -1,4 +1,5 @@
-import { Injectable }             from '@angular/core';
+import { inject,
+         Injectable }             from '@angular/core';
 import { HttpClient,
          HttpResponse }           from '@angular/common/http';
 
@@ -23,9 +24,11 @@ const credentialsKey = 'janus.credentials';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  constructor(private http: HttpClient,
-              private storageService: StorageService,
-              private authStatusService: AuthStatusService) {
+  private http = inject(HttpClient);
+  private storageService = inject(StorageService);
+  private authStatusService = inject(AuthStatusService);
+
+  constructor() {
     this.authStatusService.setAsGuest();
   }
 

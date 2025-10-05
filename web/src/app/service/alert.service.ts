@@ -1,4 +1,5 @@
-import { Injectable,
+import { inject,
+         Injectable,
          TemplateRef }      from '@angular/core';
 
 import { NbDialogService }  from '@nebular/theme';
@@ -13,11 +14,13 @@ import { Alert }            from 'model/alert.model';
 @Injectable({ providedIn: 'root' })
 export class AlertService {
 
-  confirmDialogTemplate!: TemplateRef<any>;
+  private dialogService = inject(NbDialogService);
 
   private alerts$: BehaviorSubject<Array<Alert>>;
 
-  constructor(private dialogService: NbDialogService) {
+  confirmDialogTemplate!: TemplateRef<any>;
+
+  constructor() {
       this.alerts$ = new BehaviorSubject<Array<Alert>>([]);
   }
 

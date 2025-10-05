@@ -1,9 +1,10 @@
-import { OnInit,
+import { inject,
+         OnInit,
          Component,
          OnDestroy }                    from '@angular/core';
-import { Router }                       from '@angular/router';
 
-import { NbIconModule,
+import { NbMenuItem,
+         NbIconModule,
          NbUserModule,
          NbMenuService,
          NbSearchModule,
@@ -11,17 +12,21 @@ import { NbIconModule,
          NbThemeService,
          NbActionsModule,
          NbSidebarService,
+         NbLayoutDirection,
          NbContextMenuModule,
+         NbLayoutDirectionService,
          NbMediaBreakpointsService }    from '@nebular/theme';
 
 import { NbEvaIconsModule }             from '@nebular/eva-icons';
 
-import { filter, map,
+import { map,
+         filter,
          takeUntil }                    from 'rxjs/operators';
 import { Subject }                      from 'rxjs';
 
 import { AuthService }                  from 'service/auth.service';
 import { AlertService }                 from 'service/alert.service';
+import { MenuOptionsService }           from 'service/menu-options.service';
 
 @Component({
   standalone: true,
@@ -34,6 +39,16 @@ import { AlertService }                 from 'service/alert.service';
 export class HeaderComponent implements OnInit, OnDestroy {
 
   private destroy$: Subject<void> = new Subject<void>();
+
+  private nbMenuService = inject(NbMenuService,);
+  private nbThemeService = inject(NbThemeService,);
+  private nbSidebarService = inject(NbSidebarService,);
+  private nbBreakpointService = inject(NbMediaBreakpointsService,);
+  private nbLayoutDirectionService = inject(NbLayoutDirectionService,);
+
+  private authService = inject(AuthService,);
+  private alertService = inject(AlertService);
+  private menuOptionsService = inject(MenuOptionsService);
 
   user = {
     name: 'Administrator',
@@ -53,34 +68,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ];
   currentTheme = 'default';
 
-  constructor(private router: Router,
-              private menuService: NbMenuService,
-              private themeService: NbThemeService,
-              private sidebarService: NbSidebarService,
-              private breakpointService: NbMediaBreakpointsService,
-              private authService: AuthService,
-              private alertService: AlertService) {
+  constructor() {
   }
 
   ngOnInit() {
-    this.currentTheme = this.themeService.currentTheme;
+    this.currentTheme = this.nbThemeService.currentTheme;
 
-    const { xl } = this.breakpointService.getBreakpointsMap();
-    this.themeService.onMediaQueryChange()
+    const { xl } = this.nbBreakpointService.getBreakpointsMap();
+    this.nbThemeService.onMediaQueryChange()
       .pipe(
         map(([, currentBreakpoint]) => currentBreakpoint.width < xl),
         takeUntil(this.destroy$),
       )
       .subscribe((isLessThanXl: boolean) => this.userPictureOnly = isLessThanXl);
 
-    this.themeService.onThemeChange()
+    this.nbThemeService.onThemeChange()
       .pipe(
         map(({ name }) => name),
         takeUntil(this.destroy$),
       )
       .subscribe(themeName => this.currentTheme = themeName);
 
-    this.menuService.onItemClick()
+    this.nbMenuService.onItemClick()
       .pipe(
         takeUntil(this.destroy$),
         filter(({ tag }: any) => tag === 'user-menu')
@@ -92,8 +101,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Switch layout to RTL
-    //this.layoutDirectionService.setDirection(NbLayoutDirection.RTL);
+    if (this.menuOptionsService.initialCollapsed) {
+      setTimeout(() => this.toggleSidebar(), 0);
+    }
+
+    if (this.menuOptionsService.initialRTL) {
+      setTimeout(() => this.nbLayoutDirectionService.setDirection(NbLayoutDirection.RTL), 0);
+    }
+
   }
 
   ngOnDestroy() {
@@ -101,17 +116,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get menu(): Array<NbMenuItem> {
+    return this.menuOptionsService.items;
+  }
+
   changeTheme(themeName: string) {
-    this.themeService.changeTheme(themeName);
+    this.nbThemeService.changeTheme(themeName);
   }
 
   toggleSidebar(): boolean {
-    this.sidebarService.toggle(true, 'menu-sidebar');
+    this.nbSidebarService.toggle(true, 'menu-sidebar');
     return false;
   }
 
   navigateHome() {
-    this.menuService.navigateHome();
+    this.nbMenuService.navigateHome();
     return false;
   }
 

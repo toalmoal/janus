@@ -1,4 +1,5 @@
-import { Injectable }               from '@angular/core';
+import { inject,
+         Injectable }               from '@angular/core';
 import { Router,
          RouterStateSnapshot,
          ActivatedRouteSnapshot }   from '@angular/router';
@@ -10,8 +11,10 @@ import { AuthStatusService }        from 'service/auth-status.service';
 @Injectable({ providedIn: 'root' })
 export class AuthGuard {
 
-  constructor(private router: Router,
-              private authStatusService: AuthStatusService) {}
+  private router = inject(Router);
+  private authStatusService = inject(AuthStatusService);
+
+  constructor() {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     let roles = route.data['roles'] as Array<string> || [];

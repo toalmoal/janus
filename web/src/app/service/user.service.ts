@@ -1,6 +1,6 @@
-import { Injectable }             from '@angular/core';
-import { HttpClient,
-         HttpResponse }           from '@angular/common/http';
+import { inject,
+         Injectable }             from '@angular/core';
+import { HttpClient }             from '@angular/common/http';
 
 import { Observable }             from 'rxjs';
 import { map,
@@ -18,7 +18,9 @@ const tpe: string = 'User';
 @Injectable({ providedIn: 'root' })
 export class UserService {
 
-  constructor(private http: HttpClient) {
+  private http = inject(HttpClient);
+
+  constructor() {
   }
 
   findAll(): Observable<Array<User>> {

@@ -1,8 +1,10 @@
 <div class="header-container">
   <div class="logo-container">
+    @if (menu.length > 1) {
     <a (click)="toggleSidebar()" href="#" class="sidebar-toggle">
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
+    }
     <div class="logo" (click)="navigateHome()">
       Janus
     </div>
