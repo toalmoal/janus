@@ -1,5 +1,13 @@
 <router-outlet></router-outlet>
 
+<span id="alerts">
+@for (alert of (alerts | async); track alert.uid) {
+  <nb-alert [status]="alert.type" closable (close)="closeAlert(alert)">
+    {{ alert.message }}
+  </nb-alert>
+}
+</span>
+
 <ng-template #confirmDialog let-data let-confirmDialog="dialogRef">
   <nb-card>
     <nb-card-header>{{ data.title }}</nb-card-header>

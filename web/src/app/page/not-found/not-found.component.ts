@@ -1,5 +1,6 @@
 import { Router }         from '@angular/router';
-import { Component }      from '@angular/core';
+import { inject,
+         Component }      from '@angular/core';
 
 import { NbCardModule,
          NbButtonModule,
@@ -14,7 +15,9 @@ import { NbCardModule,
 })
 export class NotFoundComponent {
 
-  constructor(private router: Router) {
+  private router = inject(Router);
+
+  constructor() {
   }
 
   gotoHome() {

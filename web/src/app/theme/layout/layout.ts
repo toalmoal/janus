@@ -1,11 +1,14 @@
-import { Component }    from '@angular/core';
+import { inject,
+         Component }          from '@angular/core';
 
-import { NbMenuModule,
+import { NbMenuItem,
+         NbMenuModule,
          NbLayoutModule,
-         NbSidebarModule }  from '@nebular/theme';
+         NbSidebarModule}     from '@nebular/theme';
 
-import { HeaderComponent }  from 'theme/components/header/header.component';
-import { FooterComponent }  from 'theme/components/footer/footer.component';
+import { HeaderComponent }    from 'theme/components/header/header.component';
+import { FooterComponent }    from 'theme/components/footer/footer.component';
+import { MenuOptionsService } from 'service/menu-options.service';
 
 @Component({
   standalone: true,
@@ -15,4 +18,16 @@ import { FooterComponent }  from 'theme/components/footer/footer.component';
   imports: [NbMenuModule, NbLayoutModule, NbSidebarModule,
             HeaderComponent, FooterComponent],
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+
+  private menuOptionsService = inject(MenuOptionsService);
+
+  get menu(): Array<NbMenuItem> {
+    return this.menuOptionsService.items;
+  }
+
+  get sidebarToRight(): (string | null) {
+    return this.menuOptionsService.initialRTL? '': null;
+  }
+
+}

@@ -1,5 +1,6 @@
 import { Router }           from '@angular/router';
-import { Component }        from '@angular/core';
+import { inject,
+         Component }        from '@angular/core';
 
 import { NbCardModule,
          NbInputModule,
@@ -16,8 +17,7 @@ import { NbCardModule,
 })
 export class LoginComponent {
 
-  constructor(private router: Router) {
-  }
+  private router = inject(Router);
 
   gotoHome() {
     this.router.navigate(['/page']);
