@@ -36,7 +36,7 @@ export class MenuOptionsService {
   }
 
   get items(): Array<NbMenuItem> {
-    return [this.HOME_MENU_ITEM, this.NOT_FOUND_MENU_ITEM];
+    return [this.HOME_MENU_ITEM];
   }
 
 };

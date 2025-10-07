@@ -9,18 +9,15 @@ import { NbMenuItem,
          NbMenuService,
          NbSearchModule,
          NbSelectModule,
-         NbThemeService,
          NbActionsModule,
          NbSidebarService,
          NbLayoutDirection,
          NbContextMenuModule,
-         NbLayoutDirectionService,
-         NbMediaBreakpointsService }    from '@nebular/theme';
+         NbLayoutDirectionService }     from '@nebular/theme';
 
 import { NbEvaIconsModule }             from '@nebular/eva-icons';
 
-import { map,
-         filter,
+import { filter,
          takeUntil }                    from 'rxjs/operators';
 import { Subject }                      from 'rxjs';
 
@@ -41,9 +38,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
 
   private nbMenuService = inject(NbMenuService,);
-  private nbThemeService = inject(NbThemeService,);
   private nbSidebarService = inject(NbSidebarService,);
-  private nbBreakpointService = inject(NbMediaBreakpointsService,);
   private nbLayoutDirectionService = inject(NbLayoutDirectionService,);
 
   private authService = inject(AuthService,);
@@ -52,7 +47,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   user = {
     name: 'Administrator',
-    img: 'user.svg'
+    img: 'male.svg'
   };
   userPictureOnly: boolean = false;
   userMenu = [ 
@@ -60,35 +55,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     { title: 'Log out', action: () => this.confirmLogout() }
   ];
 
-  themes = [
-    { value: 'default', name: 'Light' },
-    { value: 'dark', name: 'Dark' },
-    { value: 'cosmic', name: 'Cosmic' },
-    { value: 'corporate', name: 'Corporate' }
-  ];
-  currentTheme = 'default';
-
   constructor() {
   }
 
   ngOnInit() {
-    this.currentTheme = this.nbThemeService.currentTheme;
-
-    const { xl } = this.nbBreakpointService.getBreakpointsMap();
-    this.nbThemeService.onMediaQueryChange()
-      .pipe(
-        map(([, currentBreakpoint]) => currentBreakpoint.width < xl),
-        takeUntil(this.destroy$),
-      )
-      .subscribe((isLessThanXl: boolean) => this.userPictureOnly = isLessThanXl);
-
-    this.nbThemeService.onThemeChange()
-      .pipe(
-        map(({ name }) => name),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(themeName => this.currentTheme = themeName);
-
     this.nbMenuService.onItemClick()
       .pipe(
         takeUntil(this.destroy$),
@@ -118,10 +88,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   get menu(): Array<NbMenuItem> {
     return this.menuOptionsService.items;
-  }
-
-  changeTheme(themeName: string) {
-    this.nbThemeService.changeTheme(themeName);
   }
 
   toggleSidebar(): boolean {

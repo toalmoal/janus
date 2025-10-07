@@ -78,7 +78,7 @@ export const config: ApplicationConfig = {
     importProvidersFrom(NbSidebarModule.forRoot()),
     importProvidersFrom(
       NbThemeModule.forRoot(
-      { name: 'default' },
+      { name: 'corporate' },
       [ DEFAULT_THEME, COSMIC_THEME, CORPORATE_THEME, DARK_THEME ])
     )
   ]
