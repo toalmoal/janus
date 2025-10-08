@@ -3,7 +3,7 @@
     <janus-header></janus-header>
   </nb-layout-header>
 
-  @if (menu.length > 1) {
+  @if (menu().length > 1) {
   <nb-sidebar class="menu-sidebar" tag="menu-sidebar" [right]="sidebarToRight" responsive>
     <ng-content select="nb-menu"></ng-content>
   </nb-sidebar>

@@ -1,4 +1,7 @@
-import { inject, Injectable }       from '@angular/core';
+import { signal,
+         Signal,
+         Injectable,
+         WritableSignal }           from '@angular/core';
 
 import { NbMenuItem }               from '@nebular/theme';
 
@@ -18,7 +21,10 @@ export class MenuOptionsService {
     link: '/not-found'
   };
 
+  private _items: WritableSignal<Array<NbMenuItem>>;
+
   constructor() {
+    this._items = signal([this.HOME_MENU_ITEM, this.NOT_FOUND_MENU_ITEM]);
   }
 
   get initialCollapsed(): boolean {
@@ -26,11 +32,11 @@ export class MenuOptionsService {
   }
 
   get initialRTL(): boolean {
-    return true;
+    return false;
   }
 
-  get items(): Array<NbMenuItem> {
-    return [this.HOME_MENU_ITEM, this.NOT_FOUND_MENU_ITEM];
+  get items(): Signal<Array<NbMenuItem>> {
+    return this._items.asReadonly();
   }
 
 };

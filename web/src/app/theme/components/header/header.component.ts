@@ -1,8 +1,11 @@
 import { inject,
+         effect,
          OnInit,
-         Component,
-         OnDestroy }                    from '@angular/core';
+         Signal,
+         computed,
+         Component }                    from '@angular/core';
 import { Router }                       from '@angular/router';
+import { toSignal }                     from '@angular/core/rxjs-interop';
 
 import { NbMenuItem,
          NbIconModule,
@@ -14,15 +17,14 @@ import { NbMenuItem,
          NbActionsModule,
          NbSidebarService,
          NbLayoutDirection,
+         NbMediaBreakpoint,
          NbContextMenuModule,
          NbLayoutDirectionService,
          NbMediaBreakpointsService }    from '@nebular/theme';
 
 import { NbEvaIconsModule }             from '@nebular/eva-icons';
 
-import { filter, map,
-         takeUntil }                    from 'rxjs/operators';
-import { Subject }                      from 'rxjs';
+import * as _                           from 'lodash-es';
 
 import { AlertService }                 from 'service/alert.service';
 import { MenuOptionsService }           from 'service/menu-options.service';
@@ -35,71 +37,64 @@ import { MenuOptionsService }           from 'service/menu-options.service';
   imports: [NbIconModule, NbUserModule, NbSearchModule, NbSelectModule,
             NbEvaIconsModule, NbActionsModule, NbContextMenuModule]
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit {
 
   private router = inject(Router);
-  private destroy$: Subject<void> = new Subject<void>();
 
-  private nbMenuService = inject(NbMenuService,);
-  private nbThemeService = inject(NbThemeService,);
-  private nbSidebarService = inject(NbSidebarService,);
-  private nbBreakpointService = inject(NbMediaBreakpointsService,);
-  private nbLayoutDirectionService = inject(NbLayoutDirectionService,);
+  private nbMenuService = inject(NbMenuService);
+  private nbThemeService = inject(NbThemeService);
+  private nbSidebarService = inject(NbSidebarService);
+  private nbBreakpointService = inject(NbMediaBreakpointsService);
+  private nbLayoutDirectionService = inject(NbLayoutDirectionService);
 
   private alertService = inject(AlertService);
   private menuOptionsService = inject(MenuOptionsService);
 
-  user = {
+  protected user = {
     name: 'Administrator',
     img: 'user.svg'
   };
-  userPictureOnly: boolean = false;
-  userMenu = [
+  protected userMenu = [
     { title: 'Profile', action: () => console.log('profile') },
     { title: 'Log out', action: () => this.confirmLogout() }
   ];
 
-  themes = [
-    { value: 'default', name: 'Light' },
-    { value: 'dark', name: 'Dark' },
+  protected themes = [
     { value: 'cosmic', name: 'Cosmic' },
-    { value: 'corporate', name: 'Corporate' }
+    { value: 'corporate', name: 'Corporate' },
+    { value: 'dark', name: 'Dark' },
+    { value: 'default', name: 'Light' }
   ];
-  currentTheme = 'default';
+
+  protected currentTheme: Signal<string>;
+  protected userPictureOnly: Signal<boolean>;
+  private menuItemClicked = toSignal(this.nbMenuService.onItemClick());
+  private themeChangeSignal = toSignal(this.nbThemeService.onThemeChange());
+  private mediaQueryChangeSignal = toSignal(this.nbThemeService.onMediaQueryChange());
 
   constructor() {
-  }
-
-  ngOnInit() {
-    this.currentTheme = this.nbThemeService.currentTheme;
-
     const { xl } = this.nbBreakpointService.getBreakpointsMap();
-    this.nbThemeService.onMediaQueryChange()
-      .pipe(
-        map(([, currentBreakpoint]) => currentBreakpoint.width < xl),
-        takeUntil(this.destroy$),
-      )
-      .subscribe((isLessThanXl: boolean) => this.userPictureOnly = isLessThanXl);
 
-    this.nbThemeService.onThemeChange()
-      .pipe(
-        map(({ name }) => name),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(themeName => this.currentTheme = themeName);
+    this.currentTheme = computed(() => {
+      return this.themeChangeSignal()?.name ?? this.nbThemeService.currentTheme;
+    })
+    this.userPictureOnly = computed(() => {
+      const v: (NbMediaBreakpoint[] | undefined) = this.mediaQueryChangeSignal();
+      return _.get(v, '1.width', 0) < xl;
+    });
 
-    this.nbMenuService.onItemClick()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter(({ tag }: any) => tag === 'user-menu')
-      )
-      .subscribe((v: any) => {
+    effect(() => {
+      const v: any = this.menuItemClicked();
+      if (v?.tag === 'user-menu') {
         const action = v['item']['action'];
         if (action) {
           action();
         }
-      });
+      }
+    });
+  }
 
+  ngOnInit() {
     if (this.menuOptionsService.initialCollapsed) {
       setTimeout(() => this.toggleSidebar(), 0);
     }
@@ -110,12 +105,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  get menu(): Array<NbMenuItem> {
+  get menu(): Signal<Array<NbMenuItem>> {
     return this.menuOptionsService.items;
   }
 

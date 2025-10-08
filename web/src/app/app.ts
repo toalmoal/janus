@@ -1,28 +1,29 @@
-import { signal,
-         inject,
-         Component, 
+import { inject,
+         signal,
+         Signal,
+         Component,
          ViewChild,
          TemplateRef,
-         AfterViewInit }  from '@angular/core';
-import { AsyncPipe }      from '@angular/common';
-import { RouterOutlet }   from '@angular/router';
+         AfterViewInit,
+         ChangeDetectionStrategy }  from '@angular/core';
+import { RouterOutlet }             from '@angular/router';
 
 import { NbCardModule,
          NbAlertModule,
-         NbButtonModule } from '@nebular/theme';
+         NbButtonModule }           from '@nebular/theme';
 
-import { Observable }     from 'rxjs';
-
-import { Alert }          from 'model/alert.model';
-import { AlertService }   from 'service/alert.service';
+import { Alert }                    from 'model/alert.model';
+import { AlertService }             from 'service/alert.service';
 
 @Component({
   selector: 'janus-app',
   styleUrls: ['./app.scss'],
   templateUrl: './app.html',
-  imports: [AsyncPipe, RouterOutlet, NbCardModule, NbAlertModule, NbButtonModule]
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, NbCardModule, NbAlertModule, NbButtonModule]
 })
 export class App implements AfterViewInit {
+
   protected readonly title = signal('web');
 
   private alertService = inject(AlertService);
@@ -37,7 +38,7 @@ export class App implements AfterViewInit {
     this.alertService.confirmDialogTemplate = this.confirmDialogTemplate;
   }
 
-  get alerts(): Observable<Array<Alert>> {
+  get alerts(): Signal<Array<Alert>> {
     return this.alertService.alerts;
   }
 
