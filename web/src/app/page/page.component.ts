@@ -1,4 +1,5 @@
 import { inject,
+         Signal,
          Component,
          ChangeDetectionStrategy }  from '@angular/core';
 import { RouterOutlet }             from '@angular/router';
@@ -24,7 +25,7 @@ export class PageComponent {
   constructor() { 
   }
 
-  get menu(): Array<NbMenuItem> {
+  get menu(): Signal<Array<NbMenuItem>> {
     return this.menuOptionsService.items;
   }
 

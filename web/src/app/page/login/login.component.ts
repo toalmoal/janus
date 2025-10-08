@@ -1,26 +1,27 @@
 import { Router,
-         ActivatedRoute }       from '@angular/router';
+         ActivatedRoute }           from '@angular/router';
 import { inject,
          OnInit,
-         Component }            from '@angular/core';
+         Component, 
+         ChangeDetectionStrategy }  from '@angular/core';
 import { FormGroup,
          Validators,
          FormBuilder, 
          FormsModule,
-         ReactiveFormsModule }  from '@angular/forms';
+         ReactiveFormsModule }      from '@angular/forms';
 
 import { NbCardModule,
          NbAlertModule,
          NbInputModule,
          NbButtonModule,
          NbLayoutModule,
-         NbCheckboxModule }     from '@nebular/theme';
+         NbCheckboxModule }         from '@nebular/theme';
 
-import * as utils               from 'app/utils';
-import { AuthStatus }           from 'model/auth-status.model';
-import { AuthService }          from 'service/auth.service';
-import { AlertService }         from 'service/alert.service';
-import { AuthStatusService }    from 'service/auth-status.service';
+import * as utils                   from 'app/utils';
+import { AuthStatus }               from 'model/auth-status.model';
+import { AuthService }              from 'service/auth.service';
+import { AlertService }             from 'service/alert.service';
+import { AuthStatusService }        from 'service/auth-status.service';
 
 const emailRegEx: string = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
 
@@ -29,6 +30,7 @@ const emailRegEx: string = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
   selector: 'janus-login',
   styleUrls: ['./login.component.scss'],
   templateUrl: './login.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, ReactiveFormsModule, NbCardModule, NbInputModule, NbButtonModule, NbLayoutModule, NbCheckboxModule,
             NbAlertModule]
 })

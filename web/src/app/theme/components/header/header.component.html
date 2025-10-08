@@ -1,6 +1,6 @@
 <div class="header-container">
   <div class="logo-container">
-    @if (menu.length > 1) {
+    @if (menu().length > 1) {
     <a (click)="toggleSidebar()" href="#" class="sidebar-toggle">
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
@@ -17,7 +17,7 @@
     <nb-action class="user-action">
       <nb-user [nbContextMenu]="userMenu"
                nbContextMenuTag="user-menu"
-               [onlyPicture]="userPictureOnly"
+               [onlyPicture]="userPictureOnly()"
                [name]="user.name"
                [picture]="user.img">
       </nb-user>

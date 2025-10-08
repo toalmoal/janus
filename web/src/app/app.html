@@ -1,7 +1,7 @@
 <router-outlet></router-outlet>
 
 <span id="alerts">
-@for (alert of (alerts | async); track alert.uid) {
+@for (alert of alerts(); track alert.uid) {
   <nb-alert [status]="alert.type" closable (close)="closeAlert(alert)">
     {{ alert.message }}
   </nb-alert>

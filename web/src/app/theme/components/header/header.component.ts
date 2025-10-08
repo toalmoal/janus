@@ -1,7 +1,11 @@
 import { inject,
+         effect,
          OnInit,
-         Component,
-         OnDestroy }                    from '@angular/core';
+         Signal,
+         computed,
+         Component }                    from '@angular/core';
+import { Router }                       from '@angular/router';
+import { toSignal }                     from '@angular/core/rxjs-interop';
 
 import { NbMenuItem,
          NbIconModule,
@@ -9,17 +13,18 @@ import { NbMenuItem,
          NbMenuService,
          NbSearchModule,
          NbSelectModule,
+         NbThemeService,
          NbActionsModule,
          NbSidebarService,
          NbLayoutDirection,
+         NbMediaBreakpoint,
          NbContextMenuModule,
-         NbLayoutDirectionService }     from '@nebular/theme';
+         NbLayoutDirectionService,
+         NbMediaBreakpointsService }    from '@nebular/theme';
 
 import { NbEvaIconsModule }             from '@nebular/eva-icons';
 
-import { filter,
-         takeUntil }                    from 'rxjs/operators';
-import { Subject }                      from 'rxjs';
+import * as _                           from 'lodash-es';
 
 import { AuthService }                  from 'service/auth.service';
 import { AlertService }                 from 'service/alert.service';
@@ -30,47 +35,54 @@ import { MenuOptionsService }           from 'service/menu-options.service';
   selector: 'janus-header',
   styleUrls: ['./header.component.scss'],
   templateUrl: './header.component.html',
-  imports: [NbIconModule, NbUserModule, NbSearchModule, NbSelectModule, 
+  imports: [NbIconModule, NbUserModule, NbSearchModule, NbSelectModule,
             NbEvaIconsModule, NbActionsModule, NbContextMenuModule]
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-
-  private destroy$: Subject<void> = new Subject<void>();
+export class HeaderComponent implements OnInit {
 
   private nbMenuService = inject(NbMenuService,);
-  private nbSidebarService = inject(NbSidebarService,);
-  private nbLayoutDirectionService = inject(NbLayoutDirectionService,);
+  private nbThemeService = inject(NbThemeService);
+  private nbSidebarService = inject(NbSidebarService);
+  private nbLayoutDirectionService = inject(NbLayoutDirectionService);
+  private nbMediaBreakpointsService = inject(NbMediaBreakpointsService);
 
   private authService = inject(AuthService,);
   private alertService = inject(AlertService);
   private menuOptionsService = inject(MenuOptionsService);
 
-  user = {
+  protected user = {
     name: 'Administrator',
     img: 'male.svg'
   };
-  userPictureOnly: boolean = false;
-  userMenu = [ 
-    { title: 'Profile', action: () => console.log('profile') }, 
+  protected userMenu = [
+    { title: 'Profile', action: () => console.log('profile') },
     { title: 'Log out', action: () => this.confirmLogout() }
   ];
 
-  constructor() {
-  }
+  protected userPictureOnly: Signal<boolean>;
+  private menuItemClicked = toSignal(this.nbMenuService.onItemClick());
+  private mediaQueryChangeSignal = toSignal(this.nbThemeService.onMediaQueryChange());
 
-  ngOnInit() {
-    this.nbMenuService.onItemClick()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter(({ tag }: any) => tag === 'user-menu')
-      )
-      .subscribe((v: any) => {
+  constructor() {
+    const { xl } = this.nbMediaBreakpointsService.getBreakpointsMap();
+
+    this.userPictureOnly = computed(() => {
+      const v: (NbMediaBreakpoint[] | undefined) = this.mediaQueryChangeSignal();
+      return _.get(v, '1.width', 0) < xl;
+    });
+
+    effect(() => {
+      const v: any = this.menuItemClicked();
+      if (v?.tag === 'user-menu') {
         const action = v['item']['action'];
         if (action) {
           action();
         }
-      });
+      }
+    });
+  }
 
+  ngOnInit() {
     if (this.menuOptionsService.initialCollapsed) {
       setTimeout(() => this.toggleSidebar(), 0);
     }
@@ -78,15 +90,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.menuOptionsService.initialRTL) {
       setTimeout(() => this.nbLayoutDirectionService.setDirection(NbLayoutDirection.RTL), 0);
     }
-
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  get menu(): Array<NbMenuItem> {
+  get menu(): Signal<Array<NbMenuItem>> {
     return this.menuOptionsService.items;
   }
 
