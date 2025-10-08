@@ -1,11 +1,11 @@
 import { inject,
+         signal,
+         Signal,
          Injectable,
-         TemplateRef }      from '@angular/core';
+         TemplateRef,
+         WritableSignal }   from '@angular/core';
 
 import { NbDialogService }  from '@nebular/theme';
-
-import { Observable,
-         BehaviorSubject }  from 'rxjs';
 
 import * as _               from 'lodash-es';
 
@@ -16,16 +16,16 @@ export class AlertService {
 
   private dialogService = inject(NbDialogService);
 
-  private alerts$: BehaviorSubject<Array<Alert>>;
+  private _alerts: WritableSignal<Array<Alert>>;
 
   confirmDialogTemplate!: TemplateRef<any>;
 
   constructor() {
-      this.alerts$ = new BehaviorSubject<Array<Alert>>([]);
+      this._alerts = signal<Array<Alert>>([]);
   }
 
-  get alerts(): Observable<Array<Alert>> {
-    return this.alerts$.asObservable();
+  get alerts(): Signal<Array<Alert>> {
+    return this._alerts.asReadonly();
   }
 
   confirm(title: String, subTitle: string, onConfirm: () => void = () => { }, onCancel: () => void = () => { }) {
@@ -67,21 +67,14 @@ export class AlertService {
   }
 
   addAlert(alert: Alert, removeTimeout: number = 3000) {
-    const alerts = this.alerts$.value;
-    alerts.push(alert);
-    this.alerts$.next(alerts);
+    this._alerts.update((alerts: Array<Alert>) => [...alerts, alert]);
     if (removeTimeout > 0) {
       setTimeout(() => this.removeAlert(alert), 3000);
     }
   }
 
   removeAlert(alert: Alert) {
-    const alerts = this.alerts$.value;
-    const index = alerts.findIndex((v: Alert) => alert.uid == v.uid);
-    if (index > -1) {
-      alerts.splice(index, 1);
-    }
-    this.alerts$.next(alerts);
+    this._alerts.update((alerts: Array<Alert>) => _.filter((v: Alert) => alert.uid != v.uid));
   }
 
 }

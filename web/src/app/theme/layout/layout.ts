@@ -1,4 +1,5 @@
 import { inject,
+         Signal,
          Component }          from '@angular/core';
 
 import { NbMenuItem,
@@ -22,7 +23,7 @@ export class LayoutComponent {
 
   private menuOptionsService = inject(MenuOptionsService);
 
-  get menu(): Array<NbMenuItem> {
+  get menu(): Signal<Array<NbMenuItem>> {
     return this.menuOptionsService.items;
   }
 
