@@ -7,14 +7,18 @@ import { enableProdMode,
          provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter }                      from '@angular/router';
 import { withInterceptors,
-         provideHttpClient }                  from '@angular/common/http';
+         provideHttpClient,
+         withInterceptorsFromDi }             from '@angular/common/http';
+import { provideAnimations }                  from '@angular/platform-browser/animations';
 
 import { JwtModule,
          JWT_OPTIONS }                        from '@auth0/angular-jwt';
 
-import { NbDialogModule, NbMenuModule,
-         NbSidebarModule,
-         NbThemeModule }                      from '@nebular/theme';
+import { NbMenuModule,
+         NbThemeModule,
+         NbDialogModule,
+         NbWindowModule,
+         NbSidebarModule }                    from '@nebular/theme';
 
 import { DARK_THEME }                         from 'theme/styles/theme.dark';
 import { COSMIC_THEME }                       from 'theme/styles/theme.cosmic';
@@ -54,11 +58,13 @@ const jwtOptionsFactory = (authStatusService: AuthStatusService) => {
 
 export const config: ApplicationConfig = {
   providers: [
+    provideAnimations(),
     provideRouter(routes),
     provideHttpClient(
       withInterceptors([
-        appHttpInterceptor
-      ])
+        appHttpInterceptor,
+      ]),
+      withInterceptorsFromDi()
     ),
     importProvidersFrom(
       JwtModule.forRoot({
@@ -75,6 +81,7 @@ export const config: ApplicationConfig = {
     { provide: Window, useValue: WINDOW },
     importProvidersFrom(NbMenuModule.forRoot()),
     importProvidersFrom(NbDialogModule.forRoot()),
+    importProvidersFrom(NbWindowModule.forRoot()),
     importProvidersFrom(NbSidebarModule.forRoot()),
     importProvidersFrom(
       NbThemeModule.forRoot(

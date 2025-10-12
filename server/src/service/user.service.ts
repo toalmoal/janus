@@ -32,7 +32,7 @@ class UserService {
     try {
       const lEmail = email.toLowerCase();
       user = await UserService.findByEmail(lEmail);
-      success = user.disabled? false: bcrypt.compareSync(password, user.password);
+      success = (!user || user.disabled)? false: bcrypt.compareSync(password, user.password);
     } catch (error) {
       UserService.logger.error('Failed while getting user', error);
       success = false;
