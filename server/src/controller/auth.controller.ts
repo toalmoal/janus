@@ -1,26 +1,42 @@
+import _                        from 'lodash';
 import { Request,
-         Response }         from 'express';
+         Response }             from 'express';
 
-import _                    from 'lodash';
+import { Context }              from 'model/context.model';
+import { UserView }             from 'view/user.view';
+import { BadRequest }           from '@/utils/errors';
+import { UserService }          from 'service/user.service';
+import { LoggerFactory }        from '@/logger';
+import { PasswordResetService } from 'service/password-reset.service';
 
-import Context              from 'model/context.model';
-import UserView             from 'view/user.view';
-import UserService          from 'service/user.service';
-import ServerResponse       from 'view/server-response.view';
-import { LoggerFactory }    from '@/logger';
-
-class AuthController {
+export class AuthController {
 
   static logger = LoggerFactory('auth.controller')
 
   static login = async (request: Request, response: Response) => {
     const context: Context = _.get(response, 'locals.context');
-    const { email, password } = request.body;
-    const result: any = await UserService.authenticate(context, email, password);
+    const { service, email, password } = request.body;
+
+    const result: any = await UserService.authenticate(context, service, email, password);
 
     response.setHeader('Access-Token', result.token);
-    response.send(ServerResponse.success(UserView.from(result.user)));
+    response.send(UserView.toView(result.user));
   };
 
+  static requestPasswordReset = async (request: Request, response: Response) => {
+    const { email } = request.body;
+    await PasswordResetService.requestPasswordReset(email);
+    response.send({});
+  }
+
+  static passwordReset = async (request: Request, response: Response) => {
+    const { email, code, password } = request.body;
+    try {
+      await PasswordResetService.resetPassword(email, code, password);
+    } catch (err: any) {
+      throw BadRequest(err.message);
+    }
+    response.send({});
+  }
+
 }
-export default AuthController;

@@ -1,8 +1,6 @@
-import StatusController     from 'controller/status.controller';
-import errorHandlerRouter   from 'routes/error-handler.router';
+import { StatusController }     from 'controller/status.controller';
+import { errorHandlerRouter }   from 'routes/error-handler.router';
 
-const router = errorHandlerRouter();
+export const status = errorHandlerRouter();
 
-router.get('/', [], StatusController.get);
-
-export default router;
+status.get('/', [], StatusController.get);

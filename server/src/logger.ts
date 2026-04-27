@@ -1,54 +1,49 @@
-import path             from 'path';
 import winston          from 'winston';
 
-import split            from 'split';
+import chalk            from 'chalk';
 import config           from 'config';
-
 import DailyRotateFile  from 'winston-daily-rotate-file';
 
-// cache of loggers with different labels
-const loggerInstances = new Map<string, winston.Logger>();
+// Helper to resolve lazy-evaluated config values
+const getConfig = (path: string) => {
+  const value = config.get(path);
+  return typeof value === 'function' ? value() : value;
+};
 
-const LoggerFactory = (label: string) => {
-  if (loggerInstances.get(label) != null) {
-    return loggerInstances.get(label);
-  } else {
-    const logger = winston.createLogger({
+const baseLogger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.errors({ stack: true }),
+    winston.format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    })
+  ),
+  transports: [
+    new winston.transports.Console({
+      level: getConfig('logs.level.console') ?? 'debug',
+      handleExceptions: true,
       format: winston.format.combine(
-        winston.format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss'
-        }),
-        winston.format.label({ label: path.basename(label) }),
-        winston.format.json()
-      ),
-      transports: [
-        new winston.transports.Console({
-          level: 'debug',
-          handleExceptions: true,
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.printf(
-              info => `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`,
-            )
-          )
-        }),
-        new DailyRotateFile({
-          filename: `${config.get('server.logsPath')}/%DATE%.log`,
-          level: 'info',
-          datePattern: 'YYYY-MM-DD',
-          zippedArchive: true,
-          maxSize: '20m',
-          maxFiles: '14d',
-          json: true,
-          handleExceptions: true
+        winston.format.colorize(),
+        winston.format.printf(({ timestamp, level, source, stack, message }) => {
+          return `${chalk.cyan(timestamp)} ${level} [${chalk.magenta(source)}]: ${stack ?? message}`;
         })
-      ],
-      exitOnError: false
-    });
-    loggerInstances.set(label, logger);
-    return logger;
-  }
+      )
+    }),
+    new DailyRotateFile({
+      filename: `${getConfig('server.logsPath')}/%DATE%.log`,
+      level: getConfig('logs.level.file') ?? 'debug',
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '7d',
+      handleExceptions: true,
+      format: winston.format.json()
+    })
+  ],
+  exitOnError: false
+});
 
+const LoggerFactory = (source: string) => {
+  return baseLogger.child({ source });
 };
 
 const accessLogger = winston.createLogger({
@@ -70,7 +65,7 @@ const accessLogger = winston.createLogger({
       )
     }),
     new DailyRotateFile({
-      filename: `${config.get('server.logsPath')}/access-%DATE%.log`,
+      filename: `${getConfig('server.logsPath')}/access-%DATE%.log`,
       level: 'info',
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
@@ -82,10 +77,5 @@ const accessLogger = winston.createLogger({
   ],
   exitOnError: false
 });
-
-accessLogger.stream = split()
-  .on('data', function (message) {
-    accessLogger.info(message);
-  });
 
 export { LoggerFactory, accessLogger };

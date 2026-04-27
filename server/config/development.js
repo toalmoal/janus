@@ -6,6 +6,7 @@ module.exports = {
   persist: {
     type: 'mysql',
     host: "localhost",
+    username: 'root',
     password: "Qb!:@v)+4PG>Frq",
     entities: [ "src/entity/**/*{.ts,.js}" ]
   }

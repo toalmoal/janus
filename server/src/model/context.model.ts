@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-class Context {
+export class Context {
 
   contextId: string;
   email?: string;
@@ -22,13 +22,16 @@ class Context {
     return (roles ?? []).indexOf('Admin') > -1 || (roles ?? []).indexOf(role) > -1;
   }
 
-  get isAdmin(): boolean {
+  isAdmin(): boolean {
     return Context.hasRole('Admin', this.roles);
   }
 
-  get isUser(): boolean {
+  isDevOps(): boolean {
+    return Context.hasRole('DevOps', this.roles);
+  }
+
+  isUser(): boolean {
     return Context.hasRole('User', this.roles);
   }
 
 }
-export default Context;

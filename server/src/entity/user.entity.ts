@@ -1,12 +1,13 @@
 import { Entity,
          Unique,
          Column,
-         PrimaryGeneratedColumn }   from 'typeorm';
+         PrimaryGeneratedColumn } from 'typeorm';
 
-import * as bcrypt                  from 'bcryptjs';
+import { Buffer }                 from 'buffer';
+import * as bcrypt                from 'bcryptjs';
 
 @Entity('user', { orderBy: {  id: 'ASC' } })
-class User {
+export class User {
 
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
@@ -21,8 +22,8 @@ class User {
   @Column({ name: 'first_name' })
   firstName: string;
 
-  @Column({ name: 'last_name', nullable: true })
-  lastName: string;
+  @Column({ name: 'last_name', type: 'varchar', nullable: true })
+  lastName?: string | null;
 
   @Column()
   roles: string;
@@ -45,13 +46,15 @@ class User {
   }
 
   constructor(email: string, firstName: string, lastName: string, roles: string, disabled: boolean = false) {
+    this.id = 0;
     this.email = email;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.password = '';
     this.roles = roles;
     this.disabled = disabled;
     this.createdAt = new Date();
+    this.updatedAt = new Date();
   }
 
 }
-export default User;

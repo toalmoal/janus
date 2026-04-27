@@ -1,14 +1,15 @@
-import _                  from 'lodash';
-import config             from 'config';
-import { verify }         from 'jsonwebtoken';
+import _            from 'lodash';
+import config       from 'config';
+import { verify }   from 'jsonwebtoken';
 
-import Context            from 'model/context.model';
+import * as utils   from '@/utils';
+import { Context }  from 'model/context.model';
 
 const jwtTokenParser = (token: string) => {
   return <any> verify(token, config.get('crypto.secret'));
 };
 
-const contextBuilder = (jwtToken?: string, request?: any) => {
+export const contextBuilder = (jwtToken?: string, request?: any) => {
   const query: any = {};
   _.forEach(request?.query ?? {}, (value: any, key: string) => {
     if (!_.isNil(value)) {
@@ -28,8 +29,15 @@ const contextBuilder = (jwtToken?: string, request?: any) => {
   let jwtPayload;
   try {
     jwtPayload = jwtToken? jwtTokenParser(jwtToken): undefined;
+    if (jwtPayload.version != config.get('jwt.version')) {
+      throw new Error('JWT versions mismatch');
+    }
+    const createdAt = jwtPayload.createdAt? new Date(Date.parse(jwtPayload.createdAt)): new Date();
+    if (!utils.isWithinDuration(createdAt, config.get('jwt.validDuration'))) {
+      throw new Error('JWT createdAt is past valid duration');
+    }
   } catch (error: any) {
-    // ignore error
+    jwtPayload = undefined;
   }
 
   const context = new Context(
@@ -41,4 +49,3 @@ const contextBuilder = (jwtToken?: string, request?: any) => {
 
   return context;
 };
-export default contextBuilder;

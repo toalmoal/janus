@@ -1,6 +1,7 @@
-import config         from 'config';
-
 import 'reflect-metadata';
-import { DataSource } from "typeorm";
 
-export default new DataSource(config.get('persist'));
+import config                               from 'config';
+
+import { DataSource as TypeOrmDataSource }  from "typeorm";
+
+export const DataSource = new TypeOrmDataSource(config.get('persist'));

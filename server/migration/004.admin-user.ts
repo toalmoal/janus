@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class CreateAdminUser_1759338086192 implements MigrationInterface {
+export class CreateAdminUser_1759328647004 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -11,7 +11,7 @@ export class CreateAdminUser_1759338086192 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      "DELETE FROM `user` WHERE `email`='admin@toalmoal.com'"
+      "DELETE FROM `user` WHERE `email` in ('admin@toalmoal.com')"
     );
   }
 

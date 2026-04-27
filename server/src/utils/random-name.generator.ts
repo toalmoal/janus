@@ -1,4 +1,4 @@
-class RandomNameGenerator {
+export class RandomNameGenerator {
 
   static get = () => {
     const index = Math.floor(Math.random() * RandomNameGenerator.names.length);
@@ -1358,4 +1358,3 @@ class RandomNameGenerator {
      "Zoom"
    ];
 }
-export default RandomNameGenerator;

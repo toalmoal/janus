@@ -1,11 +1,12 @@
 {
+   "include": ["src"],
    "compilerOptions": {
       "lib": [
          "dom",
-         "es5",
-         "es6"
+         "ES2022"
       ],
       "outDir": "dist",
+      "rootDir": "src",
       "baseUrl": ".",
       "paths": {
          "@/*": [ "src/*" ],
@@ -25,6 +26,10 @@
       "isolatedModules": true,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
+      "ignoreDeprecations": "6.0",
       "sourceMap": true
-   }
+   },
+   "types": [
+      "node"
+   ]   
 }

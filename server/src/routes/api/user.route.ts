@@ -1,9 +1,11 @@
-import checkRole            from 'middleware/check-role.middleware';
-import UserController       from 'controller/user.controller';
-import errorHandlerRouter   from 'routes/error-handler.router';
+import { checkRole }            from 'middleware/check-role.middleware';
+import { UserController }       from 'controller/user.controller';
+import { errorHandlerRouter }   from 'routes/error-handler.router';
 
-const router = errorHandlerRouter();
+export const user = errorHandlerRouter();
 
-router.post('/search', [checkRole('Admin')], UserController.findAll);
+user.post('/search', [checkRole('Admin', true)], UserController.findAll);
 
-export default router;
+user.post('/', [checkRole('Admin', true)], UserController.insert);
+
+user.put('/', [checkRole('Admin', true)], UserController.update);

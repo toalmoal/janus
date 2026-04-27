@@ -1,16 +1,14 @@
+import si                       from 'systeminformation';
 import { Request,
-         Response }         from 'express';
+         Response }             from 'express';
 
-import si                   from 'systeminformation';
+import { RandomNameGenerator }  from 'utils/random-name.generator';
 
-import ServerResponse       from 'view/server-response.view';
-import RandomNameGenerator  from 'utils/random-name.generator';
-
-class StatusController {
+export class StatusController {
 
   static uid: string = RandomNameGenerator.get();
 
-  static formatBytes = (a, b = 2) => {
+  static formatBytes = (a: number, b = 2) => {
     if (0 === a)
       return "0 Bytes";
     const c = 0>b? 0: b;
@@ -25,26 +23,26 @@ class StatusController {
     var seconds = (((value % 31536000) % 86400) % 3600) % 60;
     let formatted = '';
     if (days > 0) {
-      formatted = days + " days, ";
+      formatted += days + " days, ";
     }
-    if (hours > 0 || formatted.length > 0) {
-      formatted = hours + " hours, ";
+    if (hours > 0) {
+      formatted += hours + " hours, ";
     }
-    if (minutes > 0 || formatted.length > 0) {
-      formatted = minutes + " minutes, ";
+    if (minutes > 0) {
+      formatted += minutes + " minutes, ";
     }
-    if (seconds > 0 || formatted.length > 0) {
-      formatted = Math.floor(seconds) + " seconds";
+    if (seconds > 0) {
+      formatted += Math.floor(seconds) + " seconds";
     }
-    return formatted;
-}
+    return formatted.trim().replace(/,\s*$/, '');
+  }
 
   static get = async (request: Request, response: Response) => {
     const time = si.time();
     const status: any = {
       name: StatusController.uid,
-      version: process.env.JANUS_VERSION || 'unknown',
-      release_date: process.env.JANUS_RELEASE_DATE || 'unknown',
+      version: process.env.BRAHM_VERSION || 'unknown',
+      release_date: process.env.BRAHM_RELEASE_DATE || 'unknown',
       timezone: time.timezone,
       uptime: Math.floor(process.uptime() * 1000),
       uptime_humanised: StatusController.formatSeconds(process.uptime())
@@ -98,8 +96,7 @@ class StatusController {
       }
     };
     status.versions = process.versions;
-    response.send(ServerResponse.success({ Status: status }));
+    response.send(status);
   }
 
 }
-export default StatusController;

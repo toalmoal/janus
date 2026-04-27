@@ -1,29 +1,38 @@
 import 'reflect-metadata';
 
-import dotenv from 'dotenv';
+import dotenv                 from 'dotenv';
 dotenv.config();
 
-import config             from 'config';
-import morgan             from 'morgan';
+import path                   from 'path';
+import chalk                  from 'chalk';
+import config                 from 'config';
+import expressWinston         from 'express-winston';
 
-import cors               from 'cors';
+import cors                   from 'cors';
 import express,
        { Request,
          Response,
-         NextFunction }   from "express";
-import bodyParser         from 'body-parser';
-import fileUpload         from 'express-fileupload';
-import compression        from 'compression';
+         NextFunction }       from "express";
+import fileUpload             from 'express-fileupload';
+import compression            from 'compression';
 
-import DataSource         from '@/datasource';
+import { DataSource }         from '@/datasource';
 
-import apiRoutes          from 'routes/api';
-import initContext        from 'middleware/init-context.middleware';
-import handleErrors       from 'middleware/handle-errors.middleware';
+import { apiRoutes }          from 'routes/api';
+import { initContext }        from 'middleware/init-context.middleware';
+import { handleErrors }       from 'middleware/handle-errors.middleware';
 import { accessLogger,
-         LoggerFactory }  from '@/logger';
+         LoggerFactory }      from '@/logger';
 
 const logger = LoggerFactory('index.ts')
+
+// Helper to resolve lazy-evaluated config values
+const getConfig = (path: string) => {
+  const value = config.get(path);
+  return typeof value === 'function' ? value() : value;
+};
+
+const HTML_ROOT = path.resolve(__dirname, 'web');
 
 const shouldCompress = (request: Request, response: Response) => {
   if (request.headers['x-no-compression']) {
@@ -38,24 +47,40 @@ DataSource.initialize()
 
     app.all('*path', initContext);
 
-    app.use(cors({
+    const corsOptions = {
       credentials: true,
       exposedHeaders: [ 'Access-Token' ]
-    }));
+    };
+    app.disable('x-powered-by');
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    
+    app.use(cors(corsOptions));
+
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+
+    app.use(
+      expressWinston.logger({
+        winstonInstance: accessLogger,
+        meta: true,
+        msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms',
+        expressFormat: true,
+        colorize: false
+       }
+      )
+    );
+
     app.use(fileUpload({ createParentPath: true }));
     
     app.use(compression({ filter: shouldCompress }));
-    
-    app.use(morgan('combined', { stream: accessLogger.stream }));
 
-    logger.info(`static path: ${config.get('server.staticPath')}`);
-    app.use(express.static(config.get('server.staticPath')));
+    logger.info(`static path: ${getConfig('server.staticPath')}`);
+    app.use(express.static(getConfig('server.staticPath')));
+
+    logger.info(`html path: ${HTML_ROOT}`);
+    app.use(express.static(HTML_ROOT));
 
     app.use('/api', apiRoutes);
+
     app.use(function (req: Request, res: Response, next: NextFunction) {
       if (!req.path.startsWith('/api')) {
         res.removeHeader('Content-Security-Policy');
@@ -67,7 +92,7 @@ DataSource.initialize()
     app.use(handleErrors);
     
     const port = config.get('server.port');
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
       console.log();
       console.log('      ##    ###    ##    ## ##     ##  ######  ');
       console.log('      ##   ## ##   ###   ## ##     ## ##    ## ');
@@ -77,10 +102,9 @@ DataSource.initialize()
       console.log('##    ## ##     ## ##   ### ##     ## ##    ## ');
       console.log(' ######  ##     ## ##    ##  #######   ######  ');
       console.log();
-      console.log('Copyright (c) 2021-26 by ToalMoal Private Ltd.');
+      console.log(chalk.blue('Copyright (c) 2021-2026 by ToalMoal Private Ltd.'));
       console.log();
 
-      console.log(`Janus server ver#${process.env.JANUS_VERSION} started on port ${port}!`);
       logger.info(`Janus server ver#${process.env.JANUS_VERSION} started on port ${port}!`);
     });
   })

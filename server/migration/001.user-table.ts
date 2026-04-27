@@ -1,26 +1,30 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class LoginHistoryTable_1759329168210 implements MigrationInterface {
+export class UserTable_1759328647001 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      'CREATE TABLE `login_history` (\
+      'CREATE TABLE `user` (\
         `id` bigint NOT NULL AUTO_INCREMENT,\
         `email` varchar(256) NOT NULL,\
-        `ip_address` varchar(19) DEFAULT NULL,\
-        `success` tinyint(1) NOT NULL,\
+        `password` varchar(128) NOT NULL,\
+        `first_name` varchar(128) DEFAULT NULL,\
+        `last_name` varchar(128) DEFAULT NULL,\
+        `roles` varchar(256) NOT NULL,\
+        `disabled` bit DEFAULT 0,\
         `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),\
+        `updated_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),\
         PRIMARY KEY (`id`)\
       )'
     );
     await queryRunner.query(
-      'CREATE INDEX `login_history-email-idx` ON `login_history`(`email`)'
+      'CREATE UNIQUE INDEX `user-email-idx` ON `user`(`email`)'
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      'DROP TABLE `login_history`'
+      'DROP TABLE `user`'
     );
   }
 
